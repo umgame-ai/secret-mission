@@ -1,0 +1,886 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конструктор секретной миссии — Юлия Сиротина</title>
+<style>
+:root {
+  --green: #234B3B;
+  --sage: #E8EFE7;
+  --cream: #FAF7F1;
+  --gold: #D6B775;
+  --pink: #E7BCC5;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--green);
+  font: 16px/1.55 Arial, sans-serif;
+}
+.container {
+  max-width: 850px;
+  margin: auto;
+  padding: 18px;
+}
+.hero {
+  background: var(--green);
+  color: white;
+  border-radius: 24px;
+  padding: 38px 30px;
+  text-align: center;
+}
+h1, h2 { font-family: Georgia, serif; line-height: 1.2; }
+h1 { font-size: clamp(30px, 5vw, 45px); }
+h2 { font-size: 27px; }
+.eyebrow {
+  color: var(--gold);
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+}
+.card {
+  background: white;
+  padding: 27px;
+  margin-top: 20px;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px #234b3b0a;
+}
+.step { display: none; }
+.step.active { display: block; }
+.progress {
+  height: 8px;
+  background: var(--sage);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 15px 0 25px;
+}
+.progress-fill {
+  background: var(--green);
+  height: 100%;
+  width: 20%;
+  transition: width .25s;
+}
+label {
+  display: block;
+  font-weight: bold;
+  margin: 16px 0 8px;
+}
+select, input[type="text"], textarea {
+  width: 100%;
+  border: 1px solid #c4d1c6;
+  border-radius: 12px;
+  padding: 13px;
+  font: inherit;
+  color: var(--green);
+}
+textarea { min-height: 120px; resize: vertical; }
+.plots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.plot {
+  background: var(--cream);
+  border: 1px solid #d8dfd6;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--green);
+  font: inherit;
+}
+.plot.selected {
+  background: var(--sage);
+  border: 2px solid var(--green);
+  font-weight: bold;
+}
+.hint {
+  background: var(--sage);
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 17px;
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.btn {
+  background: var(--green);
+  color: white;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font: bold 15px Arial, sans-serif;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+.btn.secondary {
+  background: var(--sage);
+  color: var(--green);
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.hidden { display: none !important; }
+.mission-result {
+  background: var(--cream);
+  padding: 20px;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  padding: 11px 13px;
+  background: var(--sage);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--green);
+}
+.tab.active { background: var(--green); color: white; }
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 15px;
+}
+.example {
+  background: #F5E8E5;
+  padding: 18px;
+  border-radius: 12px;
+}
+.example:last-child { background: var(--sage); }
+.checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: var(--cream);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+}
+.check input { accent-color: var(--green); }
+.offer {
+  background: var(--green);
+  color: white;
+  margin-top: 20px;
+  padding: 35px 28px;
+  border-radius: 23px;
+}
+.offer h2 { color: white; }
+.offer li { margin: 8px 0; }
+.price {
+  font: bold 47px Georgia, serif;
+  color: var(--gold);
+  margin: 19px 0 5px;
+}
+.buy {
+  display: block;
+  width: 100%;
+  background: var(--gold);
+  color: var(--green);
+  font-size: 18px;
+  padding: 17px;
+}
+small { opacity: .85; }
+footer {
+  text-align: center;
+  padding: 25px;
+  font-size: 13px;
+  color: #617365;
+}
+@media(max-width: 600px) {
+  .container { padding: 12px; }
+  .hero { padding: 30px 20px; }
+  .card { padding: 20px; }
+  .plots, .columns, .checklist {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .hero, #builder, #examples, #checkBlock,
+  #offer, footer, .result-actions { display: none !important; }
+  body { background: white; }
+  .card { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<main class="container">
+
+<header class="hero">
+  <div class="eyebrow">
+    ЮЛИЯ СИРОТИНА · БЕСПЛАТНЫЙ ПРАКТИКУМ
+  </div>
+
+  <h1>Создайте секретную миссию для своего урока за 5 шагов</h1>
+
+  <p>
+    Превратите обычное упражнение в увлекательное
+    игровое приключение!
+  </p>
+
+  <p>За 5–7 минут вы соберёте собственный сценарий миссии.</p>
+</header>
+
+<section class="card" id="builder">
+
+  <strong id="stepLabel">Шаг 1 из 5</strong>
+  <div class="progress">
+    <div class="progress-fill" id="progressBar"></div>
+  </div>
+
+  <!-- ШАГ 1 -->
+  <div class="step active">
+    <h2>Шаг 1. Учебная цель</h2>
+    <p>Определите, какой навык будет отрабатывать ученик.</p>
+
+    <label for="age">Возраст / класс</label>
+    <select id="age">
+      <option>5–6 лет</option>
+      <option selected>6–7 лет</option>
+      <option>1 класс</option>
+      <option>2 класс</option>
+      <option>3 класс</option>
+      <option>4 класс</option>
+    </select>
+
+    <label for="subject">Предмет</label>
+    <select id="subject">
+      <option>Чтение</option>
+      <option>Математика</option>
+      <option>Русский язык</option>
+    </select>
+
+    <label for="goal">Учебная цель</label>
+    <input
+      type="text"
+      id="goal"
+      value="Чтение слогов и слов"
+      placeholder="Например: сложение в пределах 10"
+    >
+
+    <div class="hint">
+      Сначала учебная задача — потом игровой сюжет.
+    </div>
+  </div>
+
+  <!-- ШАГ 2 -->
+  <div class="step">
+    <h2>Шаг 2. Выбираем секретную миссию</h2>
+    <p>Выберите один из 10 сюжетов.</p>
+
+    <div class="plots" id="plotButtons"></div>
+    <div class="hint" id="plotPreview"></div>
+  </div>
+
+  <!-- ШАГ 3 -->
+  <div class="step">
+    <h2>Шаг 3. Учебные испытания</h2>
+    <p>
+      Подберите задания, которые ребёнок будет
+      выполнять в ходе приключения.
+    </p>
+
+    <label for="count">Количество заданий</label>
+    <select id="count">
+      <option value="2">2 задания</option>
+      <option value="3" selected>3 задания</option>
+      <option value="4">4 задания</option>
+    </select>
+
+    <label for="tasks">Ваши задания</label>
+    <textarea id="tasks"
+      placeholder="1. Прочитать слова...
+2. Решить примеры...
+3. Найти верный ответ..."></textarea>
+
+    <div class="hint">
+      Упражнения должны соответствовать учебной цели
+      и уровню ребёнка. Проверяйте правильность ответов.
+    </div>
+  </div>
+
+  <!-- ШАГ 4 -->
+  <div class="step">
+    <h2>Шаг 4. Добавляем подсказки</h2>
+    <p>
+      За каждое выполненное испытание ребёнок
+      получает часть финальной разгадки.
+    </p>
+
+    <label for="reward">Выберите подсказки</label>
+    <select id="reward">
+      <option>Части секретного кода</option>
+      <option>Фрагменты карты</option>
+      <option>Ключи</option>
+      <option>Буквы секретного слова</option>
+      <option>Части изображения</option>
+    </select>
+
+    <div class="hint">
+      Подсказки связывают учебные упражнения
+      в одну игровую историю.
+    </div>
+  </div>
+
+  <!-- ШАГ 5 -->
+  <div class="step">
+    <h2>Шаг 5. Финальная разгадка</h2>
+    <p>Чем закончится ваша миссия?</p>
+
+    <div class="hint" id="finalPreview"></div>
+
+    <label for="notes">Ваши дополнительные идеи</label>
+    <textarea id="notes"
+      placeholder="Например: герой благодарит ученика,
+в финале появляется диплом секретного агента..."></textarea>
+  </div>
+
+  <div class="actions">
+    <button class="btn secondary" id="prev" disabled>
+      ← Назад
+    </button>
+
+    <button class="btn" id="next">
+      Продолжить →
+    </button>
+  </div>
+
+  <p id="error" role="alert" style="color:#9e3540"></p>
+
+</section>
+
+<!-- ГОТОВАЯ МИССИЯ -->
+<section class="card hidden" id="result">
+
+  <h2>Ваша секретная миссия готова! ✦</h2>
+
+  <p>
+    Вы создали основу игрового урока.
+    Сохраните свою карточку миссии.
+  </p>
+
+  <div class="mission-result" id="resultText"></div>
+
+  <div class="actions result-actions">
+    <button class="btn" id="copy">Скопировать</button>
+    <button class="btn secondary" id="download">
+      Сохранить файл
+    </button>
+    <button class="btn secondary" id="print">
+      Печать / PDF
+    </button>
+  </div>
+
+  <p id="copyMessage" role="status"></p>
+
+  <small>
+    Это сценарная основа, а не готовый проверенный урок.
+    Перед занятием подберите конкретные упражнения,
+    проверьте ответы и соответствие уровню ребёнка.
+  </small>
+
+</section>
+
+<!-- ТРИ ПРИМЕРА -->
+<section class="card" id="examples">
+
+  <h2>Одно задание — две подачи</h2>
+
+  <p>
+    Посмотрите, как можно превратить привычное
+    упражнение в часть секретной миссии.
+  </p>
+
+  <div class="tabs" id="exampleTabs"></div>
+
+  <div class="columns">
+    <div class="example">
+      <strong>ОБЫЧНО</strong>
+      <p id="beforeText"></p>
+    </div>
+
+    <div class="example">
+      <strong>В СЕКРЕТНОЙ МИССИИ</strong>
+      <p id="afterText"></p>
+    </div>
+  </div>
+
+  <p id="goalText"></p>
+
+</section>
+
+<!-- ЧЕК-ЛИСТ -->
+<section class="card" id="checkBlock">
+
+  <h2>Готова ли ваша миссия к уроку?</h2>
+
+  <p>Проверьте себя по 12 пунктам.</p>
+
+  <strong id="checkCount">0 из 12</strong>
+
+  <div class="progress">
+    <div class="progress-fill"
+         id="checkProgress"
+         style="width:0"></div>
+  </div>
+
+  <div class="checklist" id="checklist"></div>
+
+  <div class="hint" id="checkMessage">
+    Отметьте пункты, которые уже проверили.
+  </div>
+
+</section>
+
+<!-- ФИНАЛЬНЫЙ ПРОДАЮЩИЙ ЭКРАН -->
+<section class="offer hidden" id="offer">
+
+  <div class="eyebrow">
+    ВАША МИССИЯ ГОТОВА!
+  </div>
+
+  <h2>
+    Придумать игровую миссию — это начало.
+    А что, если материалы для урока уже готовы?
+  </h2>
+
+  <p>
+    Теперь у вас есть сюжетная основа.
+    Чтобы провести занятие, нужно подобрать задания,
+    оформить презентацию, настроить интерактив
+    и подготовить рабочие листы.
+  </p>
+
+  <p>
+    В <strong>клубе-библиотеке «Шпионы»
+    Юлии Сиротиной</strong> уже собраны игровые
+    материалы, которые вы можете выбрать
+    и адаптировать под своих учеников.
+  </p>
+
+  <h3>Что вы получите:</h3>
+
+  <ul>
+    <li>48 комплектов материалов выбранного месяца</li>
+    <li>6 возрастных направлений</li>
+    <li>Интерактивные презентации PowerPoint</li>
+    <li>Рабочие листы PDF</li>
+    <li>Бессрочное пользование приобретёнными материалами</li>
+    <li>Чат месяца с технической поддержкой</li>
+    <li>Никаких автоматических списаний</li>
+  </ul>
+
+  <div class="price">990 ₽</div>
+
+  <p>
+    За материалы одного выбранного месяца.
+    Материалы других месяцев приобретаются отдельно.
+  </p>
+
+  <!-- ПРЯМАЯ ССЫЛКА НА ОПЛАТУ LAVA -->
+  <a
+    class="btn buy"
+    id="paymentButton"
+    href="https://app.lava.top/products/b0195413-ecc2-4aff-b7fa-9a60c6b7876d"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Оплатить участие — 990 ₽ →
+  </a>
+
+  <p style="text-align:center;margin-top:15px">
+    <small>
+      Вы самостоятельно решаете, приобретать ли
+      следующий месяц. Автосписаний нет.
+    </small>
+  </p>
+
+</section>
+
+<footer>
+  Юлия Сиротина · Конструктор секретной миссии
+</footer>
+
+</main>
+
+<script>
+"use strict";
+
+// ССЫЛКА НА ОПЛАТУ
+const PAYMENT_URL =
+  "https://app.lava.top/products/b0195413-ecc2-4aff-b7fa-9a60c6b7876d";
+
+// 10 ИГРОВЫХ СЮЖЕТОВ
+const plots = [
+  {
+    name: "Секретный сейф",
+    icon: "🔐",
+    intro: "В штабе обнаружен запертый сейф.",
+    aim: "найти секретный код",
+    end: "Сейф открыт, секрет раскрыт!"
+  },
+  {
+    name: "Пропавшее письмо",
+    icon: "✉️",
+    intro: "Важное письмо исчезло при доставке.",
+    aim: "найти пропавшее письмо",
+    end: "Письмо найдено!"
+  },
+  {
+    name: "Таинственная карта",
+    icon: "🗺️",
+    intro: "На секретной карте исчезли указатели.",
+    aim: "восстановить карту",
+    end: "Карта восстановлена!"
+  },
+  {
+    name: "Спасение города",
+    icon: "🏙️",
+    intro: "В городе перестали работать механизмы.",
+    aim: "помочь жителям",
+    end: "Город спасён!"
+  },
+  {
+    name: "Шифровка агента",
+    icon: "🔎",
+    intro: "Агент прислал зашифрованное сообщение.",
+    aim: "расшифровать послание",
+    end: "Послание расшифровано!"
+  },
+  {
+    name: "Музей загадок",
+    icon: "🏛️",
+    intro: "Из музея исчез важный экспонат.",
+    aim: "найти экспонат",
+    end: "Экспонат найден!"
+  },
+  {
+    name: "Космический сигнал",
+    icon: "🚀",
+    intro: "Станция получила сигнал из космоса.",
+    aim: "разгадать сигнал",
+    end: "Сигнал расшифрован!"
+  },
+  {
+    name: "Подводная экспедиция",
+    icon: "🌊",
+    intro: "На дне океана найден сундук.",
+    aim: "открыть сундук",
+    end: "Сундук открыт!"
+  },
+  {
+    name: "Загадочный остров",
+    icon: "🏝️",
+    intro: "На карте появился неизвестный остров.",
+    aim: "раскрыть тайну острова",
+    end: "Тайна раскрыта!"
+  },
+  {
+    name: "Сломанный робот",
+    icon: "🤖",
+    intro: "Робот потерял часть программы.",
+    aim: "починить робота",
+    end: "Робот снова работает!"
+  }
+];
+
+// ТРИ ПРЕДМЕТНЫХ ПРИМЕРА
+const examples = [
+  {
+    subject: "Математика",
+    before: "Реши примеры на сложение.",
+    after: "Вычисли три части кода секретного сейфа.",
+    goal: "Учебная цель: закрепление вычислений."
+  },
+  {
+    subject: "Русский язык",
+    before: "Вставь пропущенные буквы.",
+    after: "Восстанови повреждённую шифровку агента.",
+    goal: "Учебная цель: закрепление орфограмм."
+  },
+  {
+    subject: "Чтение",
+    before: "Прочитай слова.",
+    after: "Прочитай подсказки и найди пропавшее письмо.",
+    goal: "Учебная цель: тренировка чтения."
+  }
+];
+
+// 12 ПУНКТОВ ПРОВЕРКИ
+const checks = [
+  "Есть конкретная учебная цель",
+  "Задания подходят по возрасту",
+  "Сложность соответствует уровню ребёнка",
+  "Правильные ответы проверены",
+  "Количество заданий подходит по времени",
+  "Игровая задача понятна",
+  "Испытания связаны с сюжетом",
+  "Подсказки идут в логичной последовательности",
+  "Есть понятный финал",
+  "Инструкции к заданиям понятны",
+  "Презентация технически проверена",
+  "Есть возможность изменить сложность"
+];
+
+const $ = id => document.getElementById(id);
+
+let step = 0;
+let selectedPlot = 0;
+let missionText = "";
+
+const steps = [...document.querySelectorAll(".step")];
+
+function showStep() {
+  steps.forEach((element, index) => {
+    element.classList.toggle("active", index === step);
+  });
+
+  $("stepLabel").textContent = `Шаг ${step + 1} из 5`;
+  $("progressBar").style.width = `${(step + 1) * 20}%`;
+  $("prev").disabled = step === 0;
+
+  $("next").textContent =
+    step === 4 ? "Собрать мою миссию ✦" : "Продолжить →";
+
+  $("error").textContent = "";
+}
+
+function drawPlots() {
+  $("plotButtons").replaceChildren();
+
+  plots.forEach((plot, index) => {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className =
+      "plot" + (index === selectedPlot ? " selected" : "");
+
+    button.textContent = `${plot.icon} ${plot.name}`;
+
+    button.onclick = () => {
+      selectedPlot = index;
+      drawPlots();
+      drawPreview();
+    };
+
+    $("plotButtons").appendChild(button);
+  });
+}
+
+function drawPreview() {
+  const plot = plots[selectedPlot];
+
+  $("plotPreview").textContent = plot.intro;
+  $("finalPreview").textContent = plot.end;
+}
+
+function collectMission() {
+  const plot = plots[selectedPlot];
+
+  missionText = `СЕКРЕТНАЯ МИССИЯ: ${plot.name.toUpperCase()}
+
+ВОЗРАСТ:
+${$("age").value}
+
+ПРЕДМЕТ:
+${$("subject").value}
+
+УЧЕБНАЯ ЦЕЛЬ:
+${$("goal").value.trim()}
+
+1. ИГРОВАЯ СИТУАЦИЯ
+${plot.intro}
+
+2. СЕКРЕТНАЯ МИССИЯ
+Задача ученика — ${plot.aim}.
+
+3. УЧЕБНЫЕ ИСПЫТАНИЯ
+Количество: ${$("count").value}
+
+${$("tasks").value.trim() ||
+  "Подобрать подходящие упражнения и проверить ответы."}
+
+4. ПОДСКАЗКИ
+${$("reward").value}
+
+5. ФИНАЛ
+${plot.end}
+
+ДОПОЛНИТЕЛЬНЫЕ ИДЕИ:
+${$("notes").value.trim() || "Нет"}
+
+ПРОВЕРКА ПЕРЕД УРОКОМ:
+Проверить задания, ответы, возрастную сложность,
+последовательность и работу интерактивных элементов.`;
+
+  $("resultText").textContent = missionText;
+
+  $("result").classList.remove("hidden");
+  $("offer").classList.remove("hidden");
+
+  $("result").scrollIntoView({ behavior: "smooth" });
+}
+
+// НАВИГАЦИЯ
+$("prev").onclick = () => {
+  if (step > 0) {
+    step--;
+    showStep();
+  }
+};
+
+$("next").onclick = () => {
+  if (step === 0 && !$("goal").value.trim()) {
+    $("error").textContent = "Укажите учебную цель.";
+    return;
+  }
+
+  if (step < 4) {
+    step++;
+    showStep();
+  } else {
+    collectMission();
+  }
+};
+
+// СМЕНА ПРЕДМЕТА
+$("subject").onchange = () => {
+  const goals = {
+    "Чтение": "Чтение слогов и слов",
+    "Математика": "Счёт и вычисления",
+    "Русский язык": "Орфограммы и правописание"
+  };
+
+  $("goal").value = goals[$("subject").value];
+};
+
+// КОПИРОВАНИЕ
+$("copy").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(missionText);
+    $("copyMessage").textContent = "Миссия скопирована!";
+  } catch {
+    $("copyMessage").textContent =
+      "Не удалось скопировать. Используйте сохранение файла.";
+  }
+};
+
+// СОХРАНЕНИЕ
+$("download").onclick = () => {
+  const blob = new Blob(["\uFEFF" + missionText], {
+    type: "text/plain;charset=utf-8"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "sekretnaya_missiya.txt";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+// ПЕЧАТЬ / PDF
+$("print").onclick = () => window.print();
+
+// ПРИМЕРЫ
+function drawExamples() {
+  $("exampleTabs").replaceChildren();
+
+  examples.forEach((example, index) => {
+    const button = document.createElement("button");
+
+    button.className = "tab";
+    button.type = "button";
+    button.textContent = example.subject;
+
+    if (index === 0) button.classList.add("active");
+
+    button.onclick = () => {
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.remove("active");
+      });
+
+      button.classList.add("active");
+
+      $("beforeText").textContent = example.before;
+      $("afterText").textContent = example.after;
+      $("goalText").textContent = example.goal;
+    };
+
+    $("exampleTabs").appendChild(button);
+  });
+
+  $("beforeText").textContent = examples[0].before;
+  $("afterText").textContent = examples[0].after;
+  $("goalText").textContent = examples[0].goal;
+}
+
+// ЧЕК-ЛИСТ
+function drawChecklist() {
+  checks.forEach(item => {
+    const label = document.createElement("label");
+    label.className = "check";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+
+    checkbox.onchange = updateChecklist;
+
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(item));
+
+    $("checklist").appendChild(label);
+  });
+}
+
+function updateChecklist() {
+  const total =
+    document.querySelectorAll("#checklist input:checked").length;
+
+  $("checkCount").textContent = `${total} из 12`;
+
+  $("checkProgress").style.width =
+    `${total / 12 * 100}%`;
+
+  $("checkMessage").textContent =
+    total === 12
+      ? "Все пункты отмечены! Можно проверять миссию на практике."
+      : "Неотмеченные пункты покажут, что ещё нужно подготовить.";
+}
+
+// ПОДКЛЮЧЕНИЕ ОПЛАТЫ
+$("paymentButton").href = PAYMENT_URL;
+
+// ЗАПУСК
+drawPlots();
+drawPreview();
+drawExamples();
+drawChecklist();
+showStep();
+
+</script>
+
+</body>
+</html>
